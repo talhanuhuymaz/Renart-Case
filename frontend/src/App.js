@@ -53,8 +53,10 @@ export default function App() {
   const [visibleSlides, setVisibleSlides] = useState(4);
 
   useEffect(() => {
+    const apiBase =
+      process.env.REACT_APP_API_BASE_URL || "http://localhost:5000";
     axios
-      .get("http://localhost:5000/products")
+      .get(`${apiBase}/products`)
       .then((res) => {
         const sanitized = (res.data || []).map((p, idx) => {
           const id = p.id ?? p._id ?? `p-${idx}`;
