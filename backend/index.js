@@ -4,7 +4,15 @@ const axios = require("axios");
 const products = require("./products.json");
 
 const app = express();
-app.use(cors());
+
+// CORS ayarları - tüm origin'lere izin ver
+app.use(
+  cors({
+    origin: "*",
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+  })
+);
 
 async function getGoldPrice() {
   try {
