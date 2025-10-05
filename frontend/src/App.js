@@ -28,7 +28,7 @@ function getColorDisplayName(label) {
 }
 
 function orderColorKeys(keys) {
-  const priority = ["yellow", "white", "rose", "pink"];
+  const priority = ["yellow", "white", "rose", "pink"]; // hedef sıra
   const byPriority = [];
   const others = [];
   keys.forEach((k) => {
@@ -53,10 +53,8 @@ export default function App() {
   const [visibleSlides, setVisibleSlides] = useState(4);
 
   useEffect(() => {
-    const apiBase =
-      process.env.REACT_APP_API_BASE_URL || "http://localhost:5000";
     axios
-      .get(`${apiBase}/products`)
+      .get("http://localhost:5000/products")
       .then((res) => {
         const sanitized = (res.data || []).map((p, idx) => {
           const id = p.id ?? p._id ?? `p-${idx}`;
@@ -98,17 +96,19 @@ export default function App() {
       });
   }, []);
 
+  // Ürün içi görsel carousel ayarları (sadece renk butonları ile kontrol)
   const imageSliderSettings = {
     dots: false,
-    arrows: false,
+    arrows: false, // oklar kapalı
     infinite: true,
     speed: 400,
     slidesToShow: 1,
     slidesToScroll: 1,
-    swipe: false,
+    swipe: false, // swipe kapalı; sadece renk butonları ile geçiş
     draggable: false,
   };
 
+  // Ürün listesi için yatay carousel ayarları
   const productListSettings = {
     dots: false,
     arrows: true,
@@ -117,7 +117,7 @@ export default function App() {
     slidesToShow: 4,
     slidesToScroll: 1,
     swipe: true,
-    swipeToSlide: true,
+    swipeToSlide: true, // kartların üzerine sürükleyerek rahat geçiş
     touchThreshold: 8,
     edgeFriction: 0.18,
     centerMode: false,
@@ -149,6 +149,7 @@ export default function App() {
     afterChange: (idx) => setCurrentSlide(idx),
   };
 
+  // Görünür slide sayısını ekrandan tespit et (progress için)
   useEffect(() => {
     const computeVisible = () => {
       const w = window.innerWidth;
@@ -175,6 +176,7 @@ export default function App() {
     <div className="container">
       <h1 className="page-title">Product List</h1>
 
+      {/* Ürün listesi artık yatay bir carousel içinde */}
       <Slider
         {...productListSettings}
         className="product-list-slider"
@@ -206,7 +208,7 @@ export default function App() {
               <h2 className="product-title">{p.name}</h2>
               <p className="price">${formatNumber(p.price, 2)} USD</p>
 
-              {/* Buttons Yellow, White, Rose) */}
+              {/* Renk butonları (sıra: Yellow, White, Rose) */}
               <div className="colors">
                 {colorKeys.map((ck, idx) => (
                   <button
@@ -216,7 +218,7 @@ export default function App() {
                       setSelectedColors((prev) => ({ ...prev, [p.id]: ck }));
                       const slider = sliderRefs.current[p.id];
                       if (slider && typeof slider.slickGoTo === "function") {
-                        slider.slickGoTo(idx);
+                        slider.slickGoTo(idx); // renge tıklayınca carousel o resme gider
                       }
                     }}
                     className={`color-btn ${
@@ -227,6 +229,7 @@ export default function App() {
                 ))}
               </div>
 
+              {/* Seçili renk adı */}
               <div className="color-label">
                 {getColorDisplayName(selectedColor)}
               </div>
@@ -257,7 +260,7 @@ export default function App() {
           );
         })}
       </Slider>
-
+      {/* Alt progress bar */}
       <div className="slider-progress">
         <div className="bar" style={{ width: `${progressPercent}%` }} />
       </div>
