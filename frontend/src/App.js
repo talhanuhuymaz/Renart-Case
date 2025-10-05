@@ -117,34 +117,36 @@ export default function App() {
     speed: 450,
     slidesToShow: 4,
     slidesToScroll: 1,
+    initialSlide: 0,
     swipe: true,
-    swipeToSlide: true, // kartların üzerine sürükleyerek rahat geçiş
+    swipeToSlide: true,
     touchThreshold: 8,
     edgeFriction: 0.18,
     centerMode: false,
     centerPadding: "0px",
     cssEase: "ease-out",
-    adaptiveHeight: false,
+    adaptiveHeight: true,
+    lazyLoad: 'progressive',
     responsive: [
       {
         breakpoint: 1280,
-        settings: { slidesToShow: 3 },
+        settings: { slidesToShow: 3, initialSlide: 0 },
       },
       {
         breakpoint: 960,
-        settings: { slidesToShow: 2 },
+        settings: { slidesToShow: 2, initialSlide: 0 },
       },
       {
         breakpoint: 640,
-        settings: { slidesToShow: 1 },
+        settings: { slidesToShow: 1, initialSlide: 0 },
       },
       {
         breakpoint: 480,
-        settings: { slidesToShow: 1 },
+        settings: { slidesToShow: 1, initialSlide: 0 },
       },
       {
         breakpoint: 360,
-        settings: { slidesToShow: 1 },
+        settings: { slidesToShow: 1, initialSlide: 0 },
       },
     ],
     afterChange: (idx) => setCurrentSlide(idx),
