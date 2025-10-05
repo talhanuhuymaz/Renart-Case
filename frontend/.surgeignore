@@ -1,0 +1,8 @@
+node_modules
+src
+public
+.git
+.gitignore
+package.json
+package-lock.json
+README.md
