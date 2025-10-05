@@ -46,6 +46,8 @@ function orderColorKeys(keys) {
 
 export default function App() {
   const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [selectedColors, setSelectedColors] = useState({});
   const sliderRefs = useRef({});
   const listSliderRef = useRef(null);
@@ -54,6 +56,9 @@ export default function App() {
 
   useEffect(() => {
     const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5000";
+    setLoading(true);
+    setError(null);
+
     axios
       .get(`${API_URL}/products`)
       .then((res) => {
@@ -91,9 +96,12 @@ export default function App() {
         });
 
         setProducts(sanitized);
+        setLoading(false);
       })
       .catch((err) => {
         console.error("Products fetch error:", err);
+        setError("Failed to load products. Please try again later.");
+        setLoading(false);
       });
   }, []);
 
@@ -117,36 +125,34 @@ export default function App() {
     speed: 450,
     slidesToShow: 4,
     slidesToScroll: 1,
-    initialSlide: 0,
     swipe: true,
-    swipeToSlide: true,
+    swipeToSlide: true, // kartların üzerine sürükleyerek rahat geçiş
     touchThreshold: 8,
     edgeFriction: 0.18,
     centerMode: false,
     centerPadding: "0px",
     cssEase: "ease-out",
-    adaptiveHeight: true,
-    lazyLoad: 'progressive',
+    adaptiveHeight: false,
     responsive: [
       {
         breakpoint: 1280,
-        settings: { slidesToShow: 3, initialSlide: 0 },
+        settings: { slidesToShow: 3 },
       },
       {
         breakpoint: 960,
-        settings: { slidesToShow: 2, initialSlide: 0 },
+        settings: { slidesToShow: 2 },
       },
       {
         breakpoint: 640,
-        settings: { slidesToShow: 1, initialSlide: 0 },
+        settings: { slidesToShow: 1 },
       },
       {
         breakpoint: 480,
-        settings: { slidesToShow: 1, initialSlide: 0 },
+        settings: { slidesToShow: 1 },
       },
       {
         breakpoint: 360,
-        settings: { slidesToShow: 1, initialSlide: 0 },
+        settings: { slidesToShow: 1 },
       },
     ],
     afterChange: (idx) => setCurrentSlide(idx),
@@ -174,6 +180,49 @@ export default function App() {
     100,
     Math.max(0, (currentSlide / totalScrollable) * 100)
   );
+
+  // Loading state
+  if (loading) {
+    return (
+      <div className="container">
+        <h1 className="page-title">Product List</h1>
+        <div className="loading-container">
+          <div className="spinner"></div>
+          <p>Loading products...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Error state
+  if (error) {
+    return (
+      <div className="container">
+        <h1 className="page-title">Product List</h1>
+        <div className="error-container">
+          <p className="error-message">{error}</p>
+          <button
+            className="retry-btn"
+            onClick={() => window.location.reload()}
+          >
+            Retry
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  // Empty state
+  if (products.length === 0) {
+    return (
+      <div className="container">
+        <h1 className="page-title">Product List</h1>
+        <div className="empty-container">
+          <p>No products available at the moment.</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="container">
