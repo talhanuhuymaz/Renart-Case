@@ -17,24 +17,7 @@ app.use(
 async function getGoldPrice() {
   // Try multiple APIs for better reliability
 
-  // Option 1: Try MetalpriceAPI (no key needed, free)
-  try {
-    const res = await axios.get(
-      "https://api.metalpriceapi.com/v1/latest?api_key=demo&base=USD&currencies=XAU"
-    );
-    if (res.data && res.data.rates && res.data.rates.XAU) {
-      // XAU is price per troy ounce, convert to grams
-      // 1 troy ounce = 31.1035 grams
-      const pricePerOunce = 1 / res.data.rates.XAU; // Convert rate to price
-      const pricePerGram = pricePerOunce / 31.1035;
-      console.log("MetalpriceAPI - Gold price per gram:", pricePerGram);
-      return pricePerGram;
-    }
-  } catch (err) {
-    console.error("MetalpriceAPI error:", err.message);
-  }
-
-  // Option 2: Try GoldAPI if env key is set
+  // Option 1: Try GoldAPI if env key is set
   if (process.env.GOLD_API_KEY) {
     try {
       const res = await axios.get("https://www.goldapi.io/api/XAU/USD", {
@@ -53,6 +36,22 @@ async function getGoldPrice() {
     }
   }
 
+  // Option 2: Try alternative free API (CoinGecko)
+  try {
+    const res = await axios.get(
+      "https://api.coingecko.com/api/v3/simple/price?ids=gold&vs_currencies=usd"
+    );
+    if (res.data && res.data.gold && res.data.gold.usd) {
+      // CoinGecko gives price per troy ounce, convert to grams
+      const pricePerOunce = res.data.gold.usd;
+      const pricePerGram = pricePerOunce / 31.1035;
+      console.log("CoinGecko - Gold price per gram:", pricePerGram);
+      return pricePerGram;
+    }
+  } catch (err) {
+    console.error("CoinGecko error:", err.message);
+  }
+
   // Fallback: Gerçekçi gram başına 24k altın fiyatı (USD)
   console.log("Using fallback gold price: $75/gram");
   return 75; // ~$75/gram güncel piyasa fiyatı
@@ -67,7 +66,7 @@ app.get("/", (req, res) => {
       products: "/products - Get all products with calculated prices",
     },
     goldPriceSource:
-      "MetalpriceAPI (primary) → GoldAPI (secondary) → Fallback ($75/g)",
+      "GoldAPI (if key set) → CoinGecko (free) → Fallback ($75/g)",
     status: "running",
   });
 });
